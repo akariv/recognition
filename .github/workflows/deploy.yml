@@ -3,7 +3,7 @@ name: Deploy
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
   # Allows you to run this workflow manually from the Actions tab
@@ -32,7 +32,7 @@ jobs:
           git config user.name "Adam Kariv"
       - name: deploy
         run: |
-          git checkout master
+          git checkout main
           (git branch -D dist || true)
           git checkout -b dist
           rm .gitignore
@@ -44,7 +44,7 @@ jobs:
           (git branch -D gh-pages || true)
           git subtree split --prefix dist/recognition -b gh-pages
           git push -f origin gh-pages:gh-pages
-          git checkout master
+          git checkout main
           git branch -D gh-pages
           git branch -D dist
           git checkout .
