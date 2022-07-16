@@ -17,6 +17,7 @@ export class AppComponent {
   descriptors = new ReplaySubject<Array<faceapi.LabeledFaceDescriptors>>();
   videoStream: MediaStream;
   matcher: faceapi.FaceMatcher | null = null;
+  ppl: any = {};
 
   constructor(private http: HttpClient) {
     http.get('assets/descriptors.json').subscribe((descriptors: any) => {
@@ -96,6 +97,7 @@ export class AppComponent {
 
     const minConfidence = 0.5;
     const options = new faceapi.SsdMobilenetv1Options({ minConfidence });
+    const textOptions: faceapi.draw.IDrawTextFieldOptions = {fontSize: 30, anchorPosition: faceapi.draw.AnchorPosition.TOP_RIGHT, fontStyle: 'Open Sans'};
 
     defer(async () => await faceapi.detectAllFaces(videoEl, options).withFaceLandmarks().withAgeAndGender().withFaceDescriptors()).pipe(
     ).subscribe((results) => {
@@ -104,19 +106,42 @@ export class AppComponent {
         const resizedResults = faceapi.resizeResults(results, dims);
         faceapi.draw.drawFaceLandmarks(overlayEl, resizedResults as any);  
 
+        const ppl: any = {};
+
         for (const result of resizedResults) {
-          const { age, gender } = result as any;
-
-          const text: string[] = [];
+          const { age, gender, genderProbability } = result as any;
+          let bestMatch = null;
           if (this.matcher) {
-            const bestMatch = this.matcher.findBestMatch(result.descriptor);
-            text.push(bestMatch.label);
+            bestMatch = this.matcher.findBestMatch(result.descriptor);
+            const text: string[] = [];
+            if (bestMatch.label && bestMatch.label !== 'unknown') {
+              text.push(bestMatch.label);
+              ppl[bestMatch.label] = this.ppl[bestMatch.label] || {ages: [], male: []};
+              ppl[bestMatch.label].ages = [age, ...ppl[bestMatch.label].ages.slice(0, 30)];
+              const isMale = gender === 'male' ? genderProbability : 1 - genderProbability;
+              ppl[bestMatch.label].male = [isMale, ...ppl[bestMatch.label].male.slice(0, 30)];
+            } else {
+              text.push(`${gender}, ~${faceapi.utils.round(age, 0)} years`);
+            }
+            new faceapi.draw.DrawTextField(text,
+              result.detection.box.bottomRight,
+              textOptions
+            ).draw(overlayEl);
+            const known: string[] = [];
+            Object.keys(ppl).sort().forEach((name: string) => {
+              const ages = ppl[name].ages;
+              const male = ppl[name].male;
+              const avgAge = ages.reduce((total: number, a: number) => total + a) / ages.length;
+              const avgMale = male.reduce((total: number, a: number) => total + a) / male.length;
+              known.push(`${name}: ${avgMale > 0.5 ? 'בן' : 'בת'} ${avgAge.toFixed(0)}`);
+            });
+            if (known.length > 0) {
+              new faceapi.draw.DrawTextField(known,
+                new Point(overlayEl.width, 0), textOptions
+              ).draw(overlayEl);
+            }
+            this.ppl = ppl;
           }
-          text.push(`${gender}, ~${faceapi.utils.round(age, 0)} years`);
-          new faceapi.draw.DrawTextField(text,
-            result.detection.box.bottomLeft.add(result.detection.box.bottomRight).div(new Point(2,2))
-          ).draw(overlayEl);
-
         }
       } else {
         const context = overlayEl.getContext('2d');
