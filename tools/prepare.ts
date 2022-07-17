@@ -5,7 +5,7 @@ import * as jpeg from 'jpeg-js';
 
 const canvas = require('canvas');
 
-const faceDetectionNet = faceapi.nets.ssdMobilenetv1;
+const faceDetectionNet = faceapi.nets.tinyFaceDetector;
 const modelsPath = '../src/assets/models';
 const minConfidence = 0.5;
 
@@ -34,7 +34,8 @@ async function run() {
     await faceDetectionNet.loadFromDisk(modelsPath);
     await faceapi.nets.faceLandmark68Net.loadFromDisk(modelsPath);
     await faceapi.nets.faceRecognitionNet.loadFromDisk(modelsPath);
-    const faceDetectionOptions = new faceapi.SsdMobilenetv1Options({ minConfidence });
+    // const faceDetectionOptions = new faceapi.SsdMobilenetv1Options({ minConfidence });
+    const faceDetectionOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 256 });
     console.log('LOADED');
 
     const results: any[] = [];

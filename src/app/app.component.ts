@@ -37,7 +37,8 @@ export class AppComponent {
   }
 
   async loadModels() {
-    await faceapi.loadFaceDetectionModel('assets/models');
+    await faceapi.loadTinyFaceDetectorModel('assets/models');
+    // await faceapi.loadFaceDetectionModel('assets/models');
     await faceapi.loadFaceLandmarkModel('assets/models');  
     await faceapi.loadFaceRecognitionModel('assets/models');
     await faceapi.loadAgeGenderModel('assets/models');
@@ -95,8 +96,8 @@ export class AppComponent {
     const videoEl: HTMLVideoElement = this.inputVideo.nativeElement;
     const overlayEl: HTMLCanvasElement = this.overlay.nativeElement;
 
-    const minConfidence = 0.5;
-    const options = new faceapi.SsdMobilenetv1Options({ minConfidence });
+    // const minConfidence = 0.5;
+    const options = new faceapi.TinyFaceDetectorOptions({inputSize: 256});
     const textOptions: faceapi.draw.IDrawTextFieldOptions = {fontSize: 30, anchorPosition: faceapi.draw.AnchorPosition.TOP_RIGHT, fontStyle: 'Open Sans'};
 
     defer(async () => await faceapi.detectAllFaces(videoEl, options).withFaceLandmarks().withAgeAndGender().withFaceDescriptors()).pipe(
