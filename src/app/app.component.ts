@@ -125,7 +125,7 @@ export class AppComponent {
               text.push(`${gender}, ~${faceapi.utils.round(age, 0)} years`);
             }
             new faceapi.draw.DrawTextField(text,
-              result.detection.box.bottomRight,
+              result.detection.box.bottomRight.add(result.detection.box.bottomLeft).div(new Point(2, 2)),
               textOptions
             ).draw(overlayEl);
             const known: string[] = [];
