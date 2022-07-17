@@ -123,7 +123,7 @@ export class AppComponent {
               const isMale = gender === 'male' ? genderProbability : 1 - genderProbability;
               ppl[bestMatch.label].male = [isMale, ...ppl[bestMatch.label].male.slice(0, 30)];
             } else {
-              text.push(`?, ${hebGender} ~${faceapi.utils.round(age, 0)}`);
+              text.push(`${hebGender} ~${faceapi.utils.round(age, 0)}`);
             }
             let labelPosition = result.detection.box.topRight.mul(new Point(2,2));
             labelPosition = labelPosition.add(result.detection.box.topLeft).div(new Point(3, 3));
