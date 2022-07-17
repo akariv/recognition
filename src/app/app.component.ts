@@ -124,10 +124,10 @@ export class AppComponent {
             } else {
               text.push(`${gender}, ~${faceapi.utils.round(age, 0)} years`);
             }
-            new faceapi.draw.DrawTextField(text,
-              result.detection.box.bottomRight.add(result.detection.box.bottomLeft).div(new Point(2, 2)),
-              textOptions
-            ).draw(overlayEl);
+            let labelPosition = result.detection.box.topRight.mul(new Point(2,2));
+            labelPosition = labelPosition.add(result.detection.box.topLeft).div(new Point(3, 3));
+            labelPosition = labelPosition.sub(new Point(0, result.detection.box.height*0.5));
+            new faceapi.draw.DrawTextField(text, labelPosition, textOptions).draw(overlayEl);
             const known: string[] = [];
             Object.keys(ppl).sort().forEach((name: string) => {
               const ages = ppl[name].ages;
