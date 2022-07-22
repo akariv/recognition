@@ -62,6 +62,8 @@ async function run() {
                     label: directory,
                     descriptor: Array.from(resultsRef.descriptor),
                 });
+            } else {
+                console.log('NO FACE DETECTED');
             }
         }
     }
