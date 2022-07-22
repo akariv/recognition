@@ -52,8 +52,8 @@ async function run() {
         console.log('DIRECTORY', directory);
 
         for (const image of images) {
-            const imageFile: tf.Tensor4D = await loadImage(`./data/${directory}/${image}`);
             console.log('IMAGE FILE', image);
+            const imageFile: tf.Tensor4D = await loadImage(`./data/${directory}/${image}`);
             const resultsRef = await faceapi.detectSingleFace(imageFile, faceDetectionOptions)
                     .withFaceLandmarks()
                     .withFaceDescriptor();
