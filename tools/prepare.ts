@@ -48,7 +48,8 @@ async function run() {
     for (const directory of directories) {
         const images = (await promises.readdir(`./data/${directory}/`, { withFileTypes: true }))
                 .filter(dirent => dirent.isFile())
-                .map(dirent => dirent.name);
+                .map(dirent => dirent.name)
+                .filter(name => name[0] !== '.');
         console.log('DIRECTORY', directory);
 
         for (const image of images) {
